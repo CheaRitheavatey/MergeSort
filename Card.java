@@ -1,9 +1,10 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Card {
@@ -39,11 +40,11 @@ class CardGame extends JFrame {
     private JButton sortButton;
     private JPanel cardPanel;
 
-    public CardGame() {
+    CardGame() {
         setTitle("Card Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);  // Using null layout to position components manually
-        setSize(500, 400);  // Set a fixed size for the frame
+        setSize(500, 350);  // Set a fixed size for the frame
         setLocationRelativeTo(null);
 
         // Create the deck of cards
@@ -60,10 +61,9 @@ class CardGame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Pick 5 random cards from the deck
                 hand.clear();
-                Collections.shuffle(deck);
                 for (int i = 0; i < 5; i++) {
-
-                    hand.add(deck.get(i));
+                    int randomIndex = (int) (Math.random() * deck.size());
+                    hand.add(deck.remove(randomIndex));
                 }
 
                 // Display the picked cards in the card panel
@@ -73,12 +73,12 @@ class CardGame extends JFrame {
 
         // Create the sort button
         sortButton = new JButton("Sort Cards");
-        sortButton.setBounds(280, 30, 150, 30);
+        sortButton.setBounds(250, 30, 150, 30);
         sortButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Sort the hand of cards by rank
-                mergeSort(hand);
+                // Sort the hand of cards using merge sort
+                mergeSort(hand, 0, hand.size() - 1);
 
                 // Display the sorted cards in the card panel
                 displayCards();
@@ -115,71 +115,99 @@ class CardGame extends JFrame {
 
     private void displayCards() {
         cardPanel.removeAll();
-    
+
         for (Card card : hand) {
             JLabel cardLabel = new JLabel(card.toString());
-            cardLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2)); // Add a black rectangle border to each card
+            cardLabel.setPreferredSize(new Dimension(80, 150));
+            cardLabel.setBackground(Color.WHITE); // Set the background color to white
+            cardLabel.setOpaque(true); // Make the label opaque to show the background color
+            cardLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align the text
+            cardLabel.setVerticalAlignment(SwingConstants.CENTER);
+            cardLabel.setFont(new Font("Arial", Font.PLAIN, 16)); // Set the font size to 16
+
+            // Create a custom border with rounded corners
+            Border roundedBorder = new Border() {
+                @Override
+                public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+                    Graphics2D g2d = (Graphics2D) g.create();
+                    g2d.setColor(Color.BLACK);
+                    g2d.draw(new RoundRectangle2D.Double(x, y, width - 1, height - 1, 10, 10));
+                    g2d.dispose();
+                }
+
+                @Override
+                public Insets getBorderInsets(Component c) {
+                    return new Insets(2, 2, 2, 2);
+                }
+
+                @Override
+                public boolean isBorderOpaque() {
+                    return true;
+                }
+            };
+
+            cardLabel.setBorder(roundedBorder);
             cardPanel.add(cardLabel);
         }
-    
-        revalidate();
-        repaint();
+
+        cardPanel.revalidate();
+        cardPanel.repaint();
     }
 
-    private void mergeSort(List<Card> cards) {
-        if (cards.size() <= 1) {
-            return;
+    private void mergeSort(List<Card> list, int left, int right) {
+        if (left < right) {
+            int mid = left + (right - left) / 2;
+
+            mergeSort(list, left, mid);
+            mergeSort(list, mid + 1, right);
+
+            merge(list, left, mid, right);
+        }
+    }
+
+    private void merge(List<Card> list, int left, int mid, int right) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        List<Card> leftList = new ArrayList<>();
+        List<Card> rightList = new ArrayList<>();
+
+        for (int i = 0; i < n1; i++) {
+            leftList.add(list.get(left + i));
+        }
+        for (int j = 0; j < n2; j++) {
+            rightList.add(list.get(mid + 1 + j));
         }
 
-        int mid = cards.size() / 2;
-        List<Card> left = new ArrayList<>(cards.subList(0, mid));
-        List<Card> right = new ArrayList<>(cards.subList(mid, cards.size()));
-
-        mergeSort(left);
-        mergeSort(right);
-
-        merge(cards, left, right);
-    }
-
-    private void merge(List<Card> cards, List<Card> left, List<Card> right) {
         int i = 0;
         int j = 0;
-        int k = 0;
+        int k = left;
 
-        while (i < left.size() && j < right.size()) {
-            Card leftCard = left.get(i);
-            Card rightCard = right.get(j);
-
-            if (leftCard.getRank().compareTo(rightCard.getRank()) < 0) {
-                cards.set(k, leftCard);
+        while (i < n1 && j < n2) {
+            if (leftList.get(i).getRank().compareTo(rightList.get(j).getRank()) <= 0) {
+                list.set(k, leftList.get(i));
                 i++;
             } else {
-                cards.set(k, rightCard);
+                list.set(k, rightList.get(j));
                 j++;
             }
-
             k++;
         }
 
-        while (i < left.size()) {
-            cards.set(k, left.get(i));
+        while (i < n1) {
+            list.set(k, leftList.get(i));
             i++;
             k++;
         }
 
-        while (j < right.size()) {
-            cards.set(k, right.get(j));
+        while (j < n2) {
+            list.set(k, rightList.get(j));
             j++;
             k++;
         }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new CardGame();
-            }
-        });
+        new CardGame();
     }
 }
