@@ -102,7 +102,7 @@ class CardGame extends JFrame {
         List<Card> deck = new ArrayList<>();
 
         String[] ranks = {"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"};
-        String[] suits = {"\u2660", "\u2661", "\u2662", "\u2663"}; // Spades, Hearts, Diamonds, Clubs
+        String[] suits = {"\u2660", "\u2764", "\u2662", "\u2663"}; // Spades, Hearts, Diamonds, Clubs
 
         for (String suit : suits) {
             for (String rank : ranks) {
