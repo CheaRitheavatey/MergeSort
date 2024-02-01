@@ -32,7 +32,7 @@ public class Card {
 
     @Override
     public String toString() {
-        return rank + " of " + suit;
+        return rank + suit;
     }
 }
 
@@ -106,7 +106,7 @@ class CardGame extends JFrame {
         Card[] deck = new Card[52];
 
         String[] ranks = {"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"};
-        String[] suits = {"\u2660", "\u2764", "\u2662", "\u2663"}; // Spades, Hearts, Diamonds, Clubs
+        String[] suits = {" ♠", "♥️", "♦", "♣️"}; // Spades, Hearts, Diamonds, Clubs
 
         int index = 0;
         for (String suit : suits) {
