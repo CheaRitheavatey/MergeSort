@@ -4,8 +4,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
-import java.util.ArrayList;
-import java.util.List;
+// import java.lang.reflect.Array;
+// import java.util.ArrayList;
+// import java.util.List;
+import java.util.Arrays;
+
 
 public class Card {
     // data field
@@ -34,8 +37,8 @@ public class Card {
 }
 
 class CardGame extends JFrame {
-    private List<Card> deck;
-    private List<Card> hand;
+    private Card[] deck;
+    private Card[] hand;
     private JButton pickButton;
     private JButton sortButton;
     private JPanel cardPanel;
@@ -51,7 +54,7 @@ class CardGame extends JFrame {
         deck = createDeck();
 
         // Create the hand of cards
-        hand = new ArrayList<>();
+        hand = new Card[5];
 
         // Create the pick button
         pickButton = new JButton("Pick 5 Cards");
@@ -60,10 +63,11 @@ class CardGame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Pick 5 random cards from the deck
-                hand.clear();
                 for (int i = 0; i < 5; i++) {
-                    int randomIndex = (int) (Math.random() * deck.size());
-                    hand.add(deck.remove(randomIndex));
+                    int randomIndex = (int) (Math.random() * deck.length);
+                    hand[i] = deck[randomIndex];
+                    deck[randomIndex] = deck[deck.length - 1];
+                    deck = Arrays.copyOf(deck, deck.length - 1);
                 }
 
                 // Display the picked cards in the card panel
@@ -78,7 +82,7 @@ class CardGame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Sort the hand of cards using merge sort
-                mergeSort(hand, 0, hand.size() - 1);
+                mergeSort(hand, 0, hand.length - 1);
 
                 // Display the sorted cards in the card panel
                 displayCards();
@@ -98,15 +102,17 @@ class CardGame extends JFrame {
         setVisible(true);
     }
 
-    private List<Card> createDeck() {
-        List<Card> deck = new ArrayList<>();
+    private Card[] createDeck() {
+        Card[] deck = new Card[52];
 
         String[] ranks = {"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"};
         String[] suits = {"\u2660", "\u2764", "\u2662", "\u2663"}; // Spades, Hearts, Diamonds, Clubs
 
+        int index = 0;
         for (String suit : suits) {
             for (String rank : ranks) {
-                deck.add(new Card(rank, suit));
+                deck[index] = new Card(rank, suit);
+                index++;
             }
         }
 
@@ -154,54 +160,54 @@ class CardGame extends JFrame {
         cardPanel.repaint();
     }
 
-    private void mergeSort(List<Card> list, int left, int right) {
+    private void mergeSort(Card[] cards, int left, int right) {
         if (left < right) {
             int mid = left + (right - left) / 2;
 
-            mergeSort(list, left, mid);
-            mergeSort(list, mid + 1, right);
+            mergeSort(cards, left, mid);
+            mergeSort(cards, mid + 1, right);
 
-            merge(list, left, mid, right);
+            merge(cards, left, mid, right);
         }
     }
 
-    private void merge(List<Card> list, int left, int mid, int right) {
+    private void merge(Card[] cards, int left, int mid, int right) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
-
-        List<Card> leftList = new ArrayList<>();
-        List<Card> rightList = new ArrayList<>();
-
+    
+        Card[] leftArray = new Card[n1];
+        Card[] rightArray = new Card[n2];
+    
         for (int i = 0; i < n1; i++) {
-            leftList.add(list.get(left + i));
+            leftArray[i] = cards[left + i];
         }
         for (int j = 0; j < n2; j++) {
-            rightList.add(list.get(mid + 1 + j));
+            rightArray[j] = cards[mid + 1 + j];
         }
-
+    
         int i = 0;
         int j = 0;
         int k = left;
-
+    
         while (i < n1 && j < n2) {
-            if (leftList.get(i).getRank().compareTo(rightList.get(j).getRank()) <= 0) {
-                list.set(k, leftList.get(i));
+            if (leftArray[i].getRank().compareTo(rightArray[j].getRank()) <= 0) {
+                cards[k] = leftArray[i];
                 i++;
             } else {
-                list.set(k, rightList.get(j));
+                cards[k] = rightArray[j];
                 j++;
             }
             k++;
         }
-
+    
         while (i < n1) {
-            list.set(k, leftList.get(i));
+            cards[k] = leftArray[i];
             i++;
             k++;
         }
-
+    
         while (j < n2) {
-            list.set(k, rightList.get(j));
+            cards[k] = rightArray[j];
             j++;
             k++;
         }
