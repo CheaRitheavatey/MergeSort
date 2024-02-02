@@ -160,54 +160,53 @@ class CardGame extends JFrame {
         cardPanel.repaint();
     }
 
-    private void mergeSort(Card[] cards, int left, int right) {
-        if (left < right) {
-            int mid = left + (right - left) / 2;
-
-            mergeSort(cards, left, mid);
-            mergeSort(cards, mid + 1, right);
-
-            merge(cards, left, mid, right);
+    private void mergeSort(Card[] cards) {
+        if (cards.length < 2) {
+            return;
         }
+        int midIndex = cards.length /2 ;
+        int[] leftCards = new int[midIndex];
+        int[] rightCards = new int[cards.length - midIndex];
+
+        for (int i = 0; i < midIndex; i++) {
+            leftCards[i] = cards[i];
+        }
+        
+
+        for (int i = midIndex; i < cards.length; i ++) {
+            rightCards[i - midIndex] = cards[i];
+        }
+
+        mergeSort(leftCards);
+        mergeSort(rightCards);
+
+        merge(cards, leftCards, rightCards);
     }
 
-    private void merge(Card[] cards, int left, int mid, int right) {
-        int n1 = mid - left + 1;
-        int n2 = right - mid;
-    
-        Card[] leftArray = new Card[n1];
-        Card[] rightArray = new Card[n2];
-    
-        for (int i = 0; i < n1; i++) {
-            leftArray[i] = cards[left + i];
-        }
-        for (int j = 0; j < n2; j++) {
-            rightArray[j] = cards[mid + 1 + j];
-        }
-    
+    private void merge(Card[] cards, int[] leftCards, int[] rightCards) {
         int i = 0;
         int j = 0;
-        int k = left;
+        int k = 0;
     
-        while (i < n1 && j < n2) {
-            if (leftArray[i].getRank().compareTo(rightArray[j].getRank()) <= 0) {
-                cards[k] = leftArray[i];
+        while (i < leftCards.length && j < rightCards.length) {
+            if (leftCards[i] <= rightCards[j]) {
+                cards[k] = leftCards[i];
                 i++;
             } else {
-                cards[k] = rightArray[j];
-                j++;
+                cards[k] = rightCards[j];
+                j++
             }
-            k++;
+            k++
         }
     
-        while (i < n1) {
-            cards[k] = leftArray[i];
+        while (i < leftCards.length) {
+            cards[k] = leftCards[i];
             i++;
             k++;
         }
     
-        while (j < n2) {
-            cards[k] = rightArray[j];
+        while (j < rightCards.length) {
+            cards[k] = rightCards[j];
             j++;
             k++;
         }
