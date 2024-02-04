@@ -14,6 +14,8 @@ public class DeckOfCardGui {
     private JButton sortButton;
     private int cardWidth = 80;  // Width of the resized card image
     private int cardHeight = 120;  // Height of the resized card image
+    private String[] randomFilePaths;  // Add this line as a member variable
+
 
     public DeckOfCardGui() {
         JFrame window = new JFrame();
@@ -85,7 +87,7 @@ public class DeckOfCardGui {
 
     // Choose five random cards
     private void shuffle() {
-        String[] randomFilePaths = generateRandomFilePaths(dict, 5);
+        randomFilePaths = generateRandomFilePaths(dict, 5);
         for (int i = 0; i < 5; i++) {
             String filePath = randomFilePaths[i];
             ImageIcon card = resizeImage(filePath, cardWidth, cardHeight);
@@ -97,10 +99,9 @@ public class DeckOfCardGui {
 
     // Sort the cards using merge sort
     private void sort() {
-        String[] filePaths = generateRandomFilePaths(dict, 5);
-        mergeSortFilePaths(filePaths, dict);
+        mergeSortFilePaths(randomFilePaths, dict);
         for (int i = 0; i < 5; i++) {
-            String filePath = filePaths[i];
+            String filePath = randomFilePaths[i];
             ImageIcon card = resizeImage(filePath, cardWidth, cardHeight);
             labelList.get(i).setIcon(card);
         }
