@@ -1,13 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -47,20 +40,12 @@ public class DeckOfCardGui {
 
         shuffleButton = new JButton("Shuffle");
         shuffleButton.setBounds(50, 140, 100, 30);
-        shuffleButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                shuffle();
-            }
-        });
+        shuffleButton.addActionListener(e -> shuffle());
         frame.add(shuffleButton);
 
         sortButton = new JButton("Sort");
         sortButton.setBounds(160, 140, 100, 30);
-        sortButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                sort();
-            }
-        });
+        sortButton.addActionListener(e -> sort());
         frame.add(sortButton);
 
         window.add(frame);
@@ -69,14 +54,10 @@ public class DeckOfCardGui {
 
     // Resizes the image to the specified width and height
     private ImageIcon resizeImage(String imagePath, int width, int height) {
-        try {
-            BufferedImage originalImage = ImageIO.read(new File(imagePath));
-            Image resizedImage = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-            return new ImageIcon(resizedImage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        ImageIcon imageIcon = new ImageIcon(imagePath);
+        Image image = imageIcon.getImage();
+        Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        return new ImageIcon(resizedImage);
     }
 
     // Choose five random cards
@@ -101,7 +82,8 @@ public class DeckOfCardGui {
 
         frame.removeAll();
         for (int i = 0; i < cardArray.length; i++) {
-            labelList.get(i).setIcon(cardArray[i].getImageIcon());
+            ImageIcon resizedIcon = resizeImage(cardArray[i].getImageName(), cardWidth, cardHeight);
+            labelList.get(i).setIcon(resizedIcon);
             labelList.get(i).setBounds(10 + (i * 90), 10, cardWidth, cardHeight);
             frame.add(labelList.get(i));
         }
@@ -142,21 +124,20 @@ public class DeckOfCardGui {
         System.arraycopy(merged, 0, arr, low, merged.length);
     }
 
-    public static void main(String[] args) {
-        new DeckOfCardGui();
-    }
+    public static void main(String[] args) {new DeckOfCardGui();}
 }
+
 class Card {
-    private ImageIcon imageIcon;
+    private String imageName;
     private int number;
 
     public Card(String imageName, int number) {
-        this.imageIcon = new ImageIcon(imageName);
+        this.imageName = imageName;
         this.number = number;
     }
 
-    public ImageIcon getImageIcon() {
-        return imageIcon;
+    public String getImageName() {
+        return imageName;
     }
 
     public int getNumber() {
