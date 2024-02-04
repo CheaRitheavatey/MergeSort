@@ -63,7 +63,7 @@ public class DeckOfCardGui {
     // Choose five random cards
     private void shuffle() {
         Random random = new Random();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 9; i++) {
             int randomIndex = random.nextInt(imageList.length);
             labelList.get(i).setIcon(imageList[randomIndex]);
         }
