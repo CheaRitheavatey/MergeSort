@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.List;
 
 public class DeckOfCardGui {
+    private Dictionary<String, Integer> dict;
     private ImageIcon[] imageList;
     private List<JLabel> labelList;
     private JPanel frame;
@@ -13,21 +14,13 @@ public class DeckOfCardGui {
     private JButton sortButton;
     private int cardWidth = 80;  // Width of the resized card image
     private int cardHeight = 120;  // Height of the resized card image
-    private Dictionary<String, Integer> dict;
 
     public DeckOfCardGui() {
         JFrame window = new JFrame();
         window.setTitle("Pick Five Cards Randomly");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setSize(500, 400);
+        window.setSize(480, 250);
         window.setLocationRelativeTo(null);
-
-        imageList = new ImageIcon[9];
-        for (int i = 0; i < 9; i++) {
-            String imagePath = "images/" + (i + 1) + ".jpg";
-            ImageIcon imageIcon = resizeImage(imagePath, cardWidth, cardHeight);
-            imageList[i] = imageIcon;
-        }
 
         dict = new Hashtable<>();
         dict.put("images/1.jpg", 1);
@@ -39,6 +32,13 @@ public class DeckOfCardGui {
         dict.put("images/7.jpg", 7);
         dict.put("images/8.jpg", 8);
         dict.put("images/9.jpg", 9);
+
+        imageList = new ImageIcon[9];
+        for (int i = 0; i < 9; i++) {
+            String imagePath = "images/" + (i + 1) + ".jpg";
+            ImageIcon imageIcon = resizeImage(imagePath, cardWidth, cardHeight);
+            imageList[i] = imageIcon;
+        }
 
         frame = new JPanel();
         frame.setLayout(null);
@@ -52,7 +52,7 @@ public class DeckOfCardGui {
         }
 
         shuffleButton = new JButton("Shuffle");
-        shuffleButton.setBounds(50, 140, 100, 30);
+        shuffleButton.setBounds(100, 150, 100, 30);
         shuffleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -62,7 +62,7 @@ public class DeckOfCardGui {
         frame.add(shuffleButton);
 
         sortButton = new JButton("Sort");
-        sortButton.setBounds(160, 140, 100, 30);
+        sortButton.setBounds(250, 150, 100, 30);
         sortButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -88,94 +88,28 @@ public class DeckOfCardGui {
         String[] randomFilePaths = generateRandomFilePaths(dict, 5);
         for (int i = 0; i < 5; i++) {
             String filePath = randomFilePaths[i];
-            int index = dict.get(filePath);
-            ImageIcon resizedIcon = resizeImage(filePath, cardWidth, cardHeight);
-            labelList.get(i).setIcon(resizedIcon);
+            ImageIcon card = resizeImage(filePath, cardWidth, cardHeight);
+            labelList.get(i).setIcon(card);
         }
         frame.revalidate();
         frame.repaint();
     }
 
-   // Sort the cards based on their corresponding values
+    // Sort the cards using merge sort
     private void sort() {
-        String[] filePaths = new String[5];
-        for (int i = 0; i < 5; i++) {
-            JLabel label = labelList.get(i);
-            ImageIcon icon = (ImageIcon) label.getIcon();
-            String filePath = getFilePathFromIcon(icon);
-            filePaths[i] = filePath;
-        }
-
+        String[] filePaths = generateRandomFilePaths(dict, 5);
         mergeSortFilePaths(filePaths, dict);
-
         for (int i = 0; i < 5; i++) {
             String filePath = filePaths[i];
-            ImageIcon resizedIcon = resizeImage(filePath, cardWidth, cardHeight);
-            labelList.get(i).setIcon(resizedIcon);
+            ImageIcon card = resizeImage(filePath, cardWidth, cardHeight);
+            labelList.get(i).setIcon(card);
         }
         frame.revalidate();
         frame.repaint();
     }
 
-    // Convert the file path of an image to a corresponding icon
-    private String getFilePathFromIcon(ImageIcon icon) {
-        for (Map.Entry<String, Integer> entry : dict.keys()) {
-            String filePath = entry.getKey();
-            ImageIcon imageIcon = resizeImage(filePath, cardWidth, cardHeight);
-            if (imageIcon.getImage().equals(icon.getImage())) {
-                return filePath;
-            }
-        }
-        return null;
-    }
-
-    // Sort the file paths based on their corresponding values
-    private static void mergeSortFilePaths(String[] filePaths, Dictionary<String, Integer> dict) {
-        if (filePaths.length <= 1) {
-            return;
-        }
-
-        int mid = filePaths.length / 2;
-        String[] left = Arrays.copyOfRange(filePaths, 0, mid);
-        String[] right = Arrays.copyOfRange(filePaths, mid, filePaths.length);
-
-        mergeSortFilePaths(left, dict);
-        mergeSortFilePaths(right, dict);
-
-        merge(filePaths, left, right, dict);
-    }
-
-    private static void merge(String[] filePaths, String[] left, String[] right, Dictionary<String, Integer> dict) {
-        int i = 0, j = 0, k = 0;
-
-        while (i < left.length && j < right.length) {
-            int leftValue = dict.get(left[i]);
-            int rightValue = dict.get(right[j]);
-
-            if (leftValue <= rightValue) {
-                filePaths[k] = left[i];
-                i++;
-            } else {
-                filePaths[k] = right[j];
-                j++;
-            }
-            k++;
-        }
-
-        while (i < left.length) {
-            filePaths[k] = left[i];
-            i++;
-            k++;
-        }
-
-        while (j < right.length) {
-            filePaths[k] = right[j];
-            j++;
-            k++;
-        }
-    }
-
-    private static String[] generateRandomFilePaths(Dictionary<String, Integer> dict, int numPaths) {
+    // Generate random file paths
+    private String[] generateRandomFilePaths(Dictionary<String, Integer> dict, int numPaths) {
         List<String> keysList = Collections.list(dict.keys());
         String[] filePaths = new String[numPaths];
 
@@ -191,11 +125,49 @@ public class DeckOfCardGui {
         return filePaths;
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new DeckOfCardGui();
+    // Merge sort file paths based on their corresponding values
+    private void mergeSortFilePaths(String[] filePaths, Dictionary<String, Integer> dict) {
+        if (filePaths.length <= 1) {
+            return;
+        }
+
+        int mid = filePaths.length / 2;
+        String[] left = new String[mid];
+        String[] right = new String[filePaths.length - mid];
+
+        System.arraycopy(filePaths, 0, left, 0, mid);
+        System.arraycopy(filePaths, mid, right, 0, filePaths.length - mid);
+
+        mergeSortFilePaths(left, dict);
+        mergeSortFilePaths(right, dict);
+        merge(filePaths, left, right, dict);
+    }
+
+    // Merge the two sorted arrays
+    private void merge(String[] filePaths, String[] left, String[] right, Dictionary<String, Integer> dict) {
+        int i = 0, j = 0, k = 0;
+
+        while (i < left.length && j < right.length) {
+            int leftValue = dict.get(left[i]);
+            int rightValue = dict.get(right[j]);
+
+            if (leftValue <= rightValue) {
+                filePaths[k++] = left[i++];
+            } else {
+                filePaths[k++] = right[j++];
             }
-        });
+        }
+
+        while (i < left.length) {
+            filePaths[k++] = left[i++];
+        }
+
+        while (j < right.length) {
+            filePaths[k++] = right[j++];
+        }
+    }
+
+    public static void main(String[] args) {
+        new DeckOfCardGui();
     }
 }
