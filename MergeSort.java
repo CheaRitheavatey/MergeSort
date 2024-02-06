@@ -1,6 +1,8 @@
 import java.util.Arrays;
 public class MergeSort {
+    // method 1 to divide all the elements 
     public static void merge_Sort(int[] array) {
+        // in order to divide array into half have to determine the length of left and right array 
         if (array.length < 2)
             return;
 
@@ -23,12 +25,12 @@ public class MergeSort {
         merge(array, leftArray, rightArray);
     }
 
-    // method to merge the sorted arrays
+    // method 2 to merge the sorted arrays
     public static void merge(int[] array, int[] leftArray, int[] rightArray) {
         // some index to help guide
-        int i = 0;
-        int j = 0;
-        int k = 0;
+        int i = 0; // pointer in the left array
+        int j = 0; // pointer in the right array
+        int k = 0; // pointer in the big array
 
         while (i < leftArray.length && j < rightArray.length) {
             if (leftArray[i] <= rightArray[j]) {
